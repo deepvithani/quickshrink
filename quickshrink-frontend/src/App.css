@@ -1,0 +1,2 @@
+/* Intentionally left minimal: component-level styles live in Tailwind utility classes.
+   Keep this file to satisfy existing imports; extend it only for non-utility edge cases. */

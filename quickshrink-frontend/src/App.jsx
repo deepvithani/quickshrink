@@ -29,13 +29,11 @@ const validateUrl = (value) => {
 function App() {
   const [activeTab, setActiveTab] = useState(TABS.SHORT_LINK)
 
-  // Short link state
+  // Short link state (auto-generated codes only)
   const [longUrl, setLongUrl] = useState('')
-  const [alias, setAlias] = useState('')
   const [isSubmittingShort, setIsSubmittingShort] = useState(false)
   const [shortError, setShortError] = useState('')
   const [shortUrl, setShortUrl] = useState('')
-  const [shortQrSvg, setShortQrSvg] = useState('')
 
   // Standalone QR state
   const [qrUrl, setQrUrl] = useState('')
@@ -47,7 +45,6 @@ function App() {
     event.preventDefault()
     setShortError('')
     setShortUrl('')
-    setShortQrSvg('')
 
     const validated = validateUrl(longUrl)
     if (typeof validated === 'string' && validated.startsWith('http') === false) {
@@ -67,7 +64,6 @@ function App() {
         },
         body: JSON.stringify({
           url: normalizedUrl,
-          alias: alias.trim() || undefined,
         }),
       })
 
@@ -78,26 +74,6 @@ function App() {
 
       const payload = await response.json()
       setShortUrl(payload.shortUrl)
-
-      // Request QR for the short URL via the dedicated QR API
-      try {
-        const qrResponse = await fetch(`${API_BASE_URL}/api/qr`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ url: payload.shortUrl }),
-        })
-
-        if (qrResponse.ok) {
-          const qrPayload = await qrResponse.json()
-          if (qrPayload.qrCodeSvg) {
-            setShortQrSvg(qrPayload.qrCodeSvg)
-          }
-        }
-      } catch {
-        // ignore QR failures; short link already works
-      }
     } catch (err) {
       setShortError(err.message || 'Unexpected error, please try again.')
     } finally {
@@ -243,54 +219,22 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="grid gap-3 md:grid-cols-[minmax(0,1.2fr)_minmax(0,0.9fr)] md:items-end">
-                    <div className="space-y-2">
-                      <label
-                        htmlFor="alias"
-                        className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400"
-                      >
-                        Custom back-half (optional)
-                      </label>
-                      <div className="flex rounded-2xl border border-slate-800/90 bg-slate-900/40 text-sm text-slate-100 shadow-inner ring-2 ring-transparent focus-within:border-brand-500/60 focus-within:ring-brand-500/30">
-                        <div className="hidden items-center gap-1 border-r border-slate-800/80 bg-slate-900/80 px-3 text-xs text-slate-500 sm:flex">
-                          <span className="truncate max-w-[9rem]">
-                            {window?.location?.origin ?? 'yourdomain.com'}
-                          </span>
-                          <span>/</span>
-                        </div>
-                        <input
-                          id="alias"
-                          type="text"
-                          inputMode="text"
-                          autoComplete="off"
-                          spellCheck="false"
-                          value={alias}
-                          onChange={(event) =>
-                            setAlias(event.target.value.replace(/\s+/g, '-').toLowerCase())
-                          }
-                          placeholder="my-campaign"
-                          className="min-w-0 flex-1 bg-transparent px-3 py-3.5 text-sm text-slate-100 placeholder:text-slate-500 outline-none"
-                        />
-                      </div>
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={isSubmittingShort}
-                      className="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(8,145,178,0.45)] transition hover:bg-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none"
-                    >
-                      {isSubmittingShort ? (
-                        <span className="inline-flex items-center gap-2">
-                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950" />
-                          <span>Getting your short link…</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-2">
-                          <span>Get your link for free</span>
-                        </span>
-                      )}
-                    </button>
-                  </div>
+                  <button
+                    type="submit"
+                    disabled={isSubmittingShort}
+                    className="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(8,145,178,0.45)] transition hover:bg-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none"
+                  >
+                    {isSubmittingShort ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950" />
+                        <span>Getting your short link…</span>
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-2">
+                        <span>Get your link for free</span>
+                      </span>
+                    )}
+                  </button>
 
                   {shortError && (
                     <div className="mt-2 rounded-2xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-xs text-red-200">
@@ -381,32 +325,11 @@ function App() {
                         ⧉
                       </span>
                     </button>
-
-                    {shortQrSvg && (
-                      <div className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4">
-                        <div className="flex items-center justify-between gap-2">
-                          <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
-                            QR Code
-                          </p>
-                          <p className="text-[0.7rem] text-slate-500">
-                            Scan on mobile to test your redirect.
-                          </p>
-                        </div>
-                        <div className="flex justify-center">
-                          <div
-                            className="inline-flex rounded-2xl bg-white p-3 shadow-md"
-                            // eslint-disable-next-line react/no-danger
-                            dangerouslySetInnerHTML={{ __html: shortQrSvg }}
-                          />
-                        </div>
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 text-sm text-slate-500">
                     <p className="text-[0.82rem] text-slate-300">
-                      Your shortened link (and its QR code) will appear here after you paste
-                      a URL and click{' '}
+                      Your shortened link will appear here after you paste a URL and click{' '}
                       <span className="font-medium text-brand-300">Get your link</span>.
                     </p>
                   </div>

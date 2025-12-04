@@ -25,26 +25,26 @@ console.log("Connected to MySQL");
 
 const validateUrl = (value) => {
   if (!value || typeof value !== "string") {
-    return "URL is required";
+    return { ok: false, error: "URL is required" };
   }
 
   const trimmed = value.trim();
   if (!trimmed) {
-    return "URL is required";
+    return { ok: false, error: "URL is required" };
   }
 
   let parsed;
   try {
     parsed = new URL(trimmed);
   } catch {
-    return "Invalid URL. Include https:// or http://";
+    return { ok: false, error: "Invalid URL. Include https:// or http://" };
   }
 
   if (!["http:", "https:"].includes(parsed.protocol)) {
-    return "Only HTTP and HTTPS URLs are supported";
+    return { ok: false, error: "Only HTTP and HTTPS URLs are supported" };
   }
 
-  return parsed.toString();
+  return { ok: true, value: parsed.toString() };
 };
 
 // API to shorten URL (no QR generation here)
@@ -52,12 +52,12 @@ app.post("/api/shorten", async (req, res) => {
   try {
     const { url, alias } = req.body;
 
-    const validated = validateUrl(url);
-    if (validated !== url && !validated.startsWith("http")) {
-      return res.status(400).json({ message: validated });
+    const result = validateUrl(url);
+    if (!result.ok) {
+      return res.status(400).json({ message: result.error });
     }
 
-    const normalizedUrl = validated;
+    const normalizedUrl = result.value;
 
     const trimmedAlias = typeof alias === "string" ? alias.trim() : "";
     const shortCode = trimmedAlias !== "" ? trimmedAlias : nanoid();
@@ -93,12 +93,12 @@ app.post("/api/qr", async (req, res) => {
   try {
     const { url } = req.body;
 
-    const validated = validateUrl(url);
-    if (validated !== url && !validated.startsWith("http")) {
-      return res.status(400).json({ message: validated });
+    const result = validateUrl(url);
+    if (!result.ok) {
+      return res.status(400).json({ message: result.error });
     }
 
-    const normalizedUrl = validated;
+    const normalizedUrl = result.value;
 
     const qrCodeSvg = await QRCode.toString(normalizedUrl, { type: "svg" });
 

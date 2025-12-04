@@ -41,7 +41,7 @@ function App() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          longUrl: parsed.toString(),
+          url: parsed.toString(),
           alias: alias.trim() || undefined,
         }),
       })

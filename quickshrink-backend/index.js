@@ -23,12 +23,41 @@ const pool = mysql.createPool({
 
 console.log("Connected to MySQL");
 
-// API to shorten URL
+const validateUrl = (value) => {
+  if (!value || typeof value !== "string") {
+    return "URL is required";
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return "URL is required";
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(trimmed);
+  } catch {
+    return "Invalid URL. Include https:// or http://";
+  }
+
+  if (!["http:", "https:"].includes(parsed.protocol)) {
+    return "Only HTTP and HTTPS URLs are supported";
+  }
+
+  return parsed.toString();
+};
+
+// API to shorten URL (no QR generation here)
 app.post("/api/shorten", async (req, res) => {
   try {
     const { url, alias } = req.body;
 
-    if (!url) return res.status(400).json({ message: "URL is required" });
+    const validated = validateUrl(url);
+    if (validated !== url && !validated.startsWith("http")) {
+      return res.status(400).json({ message: validated });
+    }
+
+    const normalizedUrl = validated;
 
     const trimmedAlias = typeof alias === "string" ? alias.trim() : "";
     const shortCode = trimmedAlias !== "" ? trimmedAlias : nanoid();
@@ -38,26 +67,47 @@ app.post("/api/shorten", async (req, res) => {
       [shortCode]
     );
 
-    if (existing.length > 0)
+    if (existing.length > 0) {
       return res.status(400).json({ message: "Alias already taken!" });
+    }
 
     await pool.query(
       "INSERT INTO links (original_url, short_code) VALUES (?, ?)",
-      [url, shortCode]
+      [normalizedUrl, shortCode]
     );
 
     const shortUrl = `http://localhost:${PORT}/${shortCode}`;
 
-    const qrCodeSvg = await QRCode.toString(shortUrl, { type: "svg" });
-
     return res.json({
       shortCode,
       shortUrl,
-      qrCodeSvg,
     });
   } catch (err) {
     console.error("Error:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+// Dedicated API to generate QR code for any URL (short or long)
+app.post("/api/qr", async (req, res) => {
+  try {
+    const { url } = req.body;
+
+    const validated = validateUrl(url);
+    if (validated !== url && !validated.startsWith("http")) {
+      return res.status(400).json({ message: validated });
+    }
+
+    const normalizedUrl = validated;
+
+    const qrCodeSvg = await QRCode.toString(normalizedUrl, { type: "svg" });
+
+    return res.json({
+      qrCodeSvg,
+    });
+  } catch (err) {
+    console.error("QR error:", err);
+    res.status(500).json({ message: "Unable to generate QR code" });
   }
 });
 

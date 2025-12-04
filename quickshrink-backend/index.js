@@ -30,7 +30,8 @@ app.post("/api/shorten", async (req, res) => {
 
     if (!url) return res.status(400).json({ message: "URL is required" });
 
-    const shortCode = alias?.trim() !== "" ? alias : nanoid();
+    const trimmedAlias = typeof alias === "string" ? alias.trim() : "";
+    const shortCode = trimmedAlias !== "" ? trimmedAlias : nanoid();
 
     const [existing] = await pool.query(
       "SELECT id FROM links WHERE short_code = ?",

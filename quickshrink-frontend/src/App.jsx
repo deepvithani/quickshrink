@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { FaGoogle, FaFacebookF, FaTwitter, FaMicrosoft } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000'
 
@@ -28,7 +30,7 @@ const validateUrl = (value) => {
 
 function App() {
   const [showLoader, setShowLoader] = useState(true)
-  const [showLoginPanel, setShowLoginPanel] = useState(false)
+  const [authMode, setAuthMode] = useState(null) // 'login' | 'signup' | null
   const [activeTab, setActiveTab] = useState(TABS.SHORT_LINK)
 
   // Short link state (auto-generated codes only)
@@ -158,87 +160,168 @@ function App() {
     </div>
   )
 
-  const renderLoginPanel = () => {
-    if (!showLoginPanel) return null
+  const AuthField = ({ id, label, placeholder, type = 'text', rightIcon }) => (
+    <div className="space-y-2">
+      <label htmlFor={id} className="text-sm font-semibold text-slate-700">
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          id={id}
+          type={type}
+          placeholder={placeholder}
+          className="block w-full rounded border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
+        />
+        {rightIcon && (
+          <span className="absolute inset-y-0 right-3 flex items-center text-slate-400">{rightIcon}</span>
+        )}
+      </div>
+    </div>
+  )
+
+  const SocialRow = () => (
+    <div className="flex flex-wrap gap-2">
+      {[
+        { label: 'Google', Icon: FaGoogle },
+        { label: 'Facebook', Icon: FaFacebookF },
+        { label: 'X (Twitter)', Icon: FaXTwitter },
+        { label: 'Microsoft', Icon: FaMicrosoft },
+      ].map(({ label, Icon }) => (
+        <button
+          key={label}
+          type="button"
+          className="flex items-center gap-2 rounded border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-brand-400 hover:text-brand-700"
+        >
+          <Icon className="text-base" />
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+
+  const renderAuthPage = (mode) => {
+    if (!mode) return null
+    const isLogin = mode === 'login'
+
     return (
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-slate-950/80 backdrop-blur">
-        <div className="relative w-full max-w-lg rounded-3xl border border-slate-800/70 bg-slate-950 p-6 shadow-[0_28px_80px_rgba(8,47,73,0.55)] sm:p-8">
-          <button
-            type="button"
-            onClick={() => setShowLoginPanel(false)}
-            className="absolute right-3 top-3 rounded-full p-2 text-slate-400 transition hover:bg-slate-900 hover:text-slate-100"
-            aria-label="Close login panel"
-          >
-            ✕
-          </button>
-          <div className="mb-6 space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-brand-200">
-              Welcome back
-            </p>
-            <h2 className="text-2xl font-semibold text-slate-50">Sign in to QuickShrink</h2>
-            <p className="text-sm text-slate-400">
-              Access branded links, QR analytics, and your full dashboard in seconds.
-            </p>
-          </div>
-
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <label
-                htmlFor="login-email"
-                className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400"
-              >
-                Email
-              </label>
-              <input
-                id="login-email"
-                type="email"
-                placeholder="you@example.com"
-                className="block w-full rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-100 outline-none ring-2 ring-transparent transition focus:border-brand-400 focus:ring-brand-500/30"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label
-                htmlFor="login-password"
-                className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400"
-              >
-                Password
-              </label>
-              <input
-                id="login-password"
-                type="password"
-                placeholder="••••••••"
-                className="block w-full rounded-2xl border border-slate-800 bg-slate-900/60 px-4 py-3 text-sm text-slate-100 outline-none ring-2 ring-transparent transition focus:border-brand-400 focus:ring-brand-500/30"
-              />
-            </div>
-
-            <div className="flex items-center justify-between text-sm text-slate-400">
-              <label className="inline-flex items-center gap-2">
-                <input type="checkbox" className="rounded border-slate-700 bg-slate-900 text-brand-500" />
-                <span>Keep me signed in</span>
-              </label>
-              <button type="button" className="text-brand-200 underline-offset-4 hover:underline">
-                Forgot password?
-              </button>
-            </div>
-
+      <div className="fixed inset-0 z-40 overflow-y-auto bg-slate-900/70 backdrop-blur">
+        <div className="min-h-screen bg-slate-100 shadow-2xl">
+          <div className="flex justify-end px-4 py-3">
             <button
               type="button"
-              className="flex w-full items-center justify-center rounded-2xl bg-brand-500 px-4 py-3 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(6,182,212,0.5)] transition hover:bg-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200"
+              onClick={() => setAuthMode(null)}
+              className="rounded-full px-3 py-1 text-sm font-semibold text-slate-600 transition hover:bg-slate-200 hover:text-slate-900"
             >
-              Log In
+              ✕
             </button>
+          </div>
 
-            <div className="text-center text-sm text-slate-400">
-              Don&apos;t have an account?{' '}
-              <button
-                type="button"
-                className="font-semibold text-brand-200 underline-offset-4 hover:underline"
-              >
-                Create one
-              </button>
+          <div className="grid min-h-[calc(100vh-64px)] gap-0 border-t border-slate-200 bg-white lg:grid-cols-[1.05fr_0.95fr]">
+            <div className="flex flex-col px-8 pb-12 pt-6 sm:px-12 sm:pt-10">
+              <div className="mb-6 space-y-1">
+                <h1 className="text-4xl font-black text-slate-800">{isLogin ? 'Log In' : 'Sign Up'}</h1>
+                <p className="text-sm text-slate-600">
+                  {isLogin ? (
+                    <>
+                      Don&apos;t have an account?{' '}
+                      <button
+                        type="button"
+                        className="font-semibold text-[#0077a8] underline-offset-2 hover:underline"
+                        onClick={() => setAuthMode('signup')}
+                      >
+                        Sign Up
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      Already a user?{' '}
+                      <button
+                        type="button"
+                        className="font-semibold text-[#0077a8] underline-offset-2 hover:underline"
+                        onClick={() => setAuthMode('login')}
+                      >
+                        Log In
+                      </button>
+                    </>
+                  )}
+                </p>
+              </div>
+
+              <form className="space-y-4">
+                {!isLogin && (
+                  <AuthField id="signup-name" label="Name" placeholder="Enter Full Name" />
+                )}
+                <AuthField id={`${mode}-email`} label="Email" placeholder="Enter Email Address" />
+                <AuthField
+                  id={`${mode}-password`}
+                  label="Password"
+                  type="password"
+                  placeholder="Enter Password"
+                  rightIcon="👁"
+                />
+
+                {!isLogin && (
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 text-xs text-slate-600">
+                      <span className="h-1.5 flex-1 rounded bg-gradient-to-r from-slate-300 via-amber-300 to-green-400" />
+                      <span>Security</span>
+                      <span className="text-slate-500">ⓘ</span>
+                    </div>
+                  </div>
+                )}
+
+                {isLogin && (
+                  <div className="flex items-center justify-between text-sm text-slate-600">
+                    <label className="inline-flex items-center gap-2">
+                      <input type="checkbox" className="rounded border-slate-400 text-brand-500" />
+                      <span>Keep me logged in</span>
+                    </label>
+                    <button type="button" className="font-semibold text-[#0077a8] hover:underline">
+                      Forgot password?
+                    </button>
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="flex w-full items-center justify-center rounded bg-slate-400 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-500"
+                >
+                  {isLogin ? 'Log In' : 'Sign Up'}
+                </button>
+
+                {!isLogin && (
+                  <p className="text-[12px] leading-relaxed text-slate-500">
+                    By Signing Up, you agree to our Terms of Service, Privacy Policy, and Use of Cookies.
+                  </p>
+                )}
+              </form>
+
+              <div className="my-6 flex items-center gap-4 text-sm font-semibold text-slate-500">
+                <div className="h-px flex-1 bg-slate-300" />
+                <span>or</span>
+                <div className="h-px flex-1 bg-slate-300" />
+              </div>
+
+              <SocialRow />
             </div>
-          </form>
+
+            <div className="relative overflow-hidden bg-gradient-to-b from-[#0c7ea3] via-[#0b5f88] to-[#063b58] text-white">
+              <div className="absolute inset-0 opacity-30" />
+              <div className="relative flex h-full flex-col items-center justify-center px-6 py-10 text-center sm:px-8">
+                <div className="mb-6 flex h-64 w-64 items-center justify-center rounded-full bg-white/10 backdrop-blur">
+                  <div className="h-44 w-44 rounded-full bg-white/20 backdrop-blur" />
+                </div>
+                <h3 className="text-2xl font-bold">
+                  {isLogin ? 'Welcome Back!' : 'Amplify Your Success'}
+                </h3>
+                <p className="mt-3 max-w-md text-sm text-white/80">
+                  {isLogin
+                    ? 'Your dashboard is waiting—shorten, track, and share smarter.'
+                    : 'Create data-driven shortened links and branded QR codes with QuickShrink.'}
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -274,52 +357,46 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-950/90 text-slate-100">
       {showLoader && renderLoader()}
-      {renderLoginPanel()}
+      {renderAuthPage(authMode)}
 
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(6,182,212,0.15),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(56,189,248,0.12),transparent_35%),radial-gradient(circle_at_20%_80%,rgba(14,165,233,0.08),transparent_30%)]" />
 
-      <div className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-8 sm:px-6 lg:px-10">
-        <header className="mb-12 flex items-center justify-between gap-6 rounded-3xl border border-slate-800/70 bg-slate-950/70 px-5 py-4 shadow-soft backdrop-blur">
+      <header className="sticky top-0 z-30 w-full bg-[#0b3c50] text-white shadow-lg">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500/15 ring-1 ring-brand-400/60">
-              <span className="text-xl font-semibold text-brand-200">QS</span>
-            </div>
-            <div>
-              <p className="text-lg font-semibold tracking-tight text-slate-50">
-                QuickShrink
-              </p>
-              <p className="text-xs text-slate-400">Links, QR, branded domains</p>
-            </div>
+            <span className="text-3xl font-black tracking-[0.18em] text-white">QUICKSHRINK</span>
           </div>
-
-          <nav className="hidden items-center gap-6 text-sm text-slate-300 sm:flex">
+          <nav className="hidden items-center gap-6 text-sm sm:flex">
             {['Plans', 'Features', 'Domains', 'Resources'].map((item) => (
               <button
                 key={item}
                 type="button"
-                className="rounded-full px-3 py-2 transition hover:bg-slate-900 hover:text-slate-50"
+                className="rounded px-2 py-1 font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
               >
                 {item}
               </button>
             ))}
           </nav>
-
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setShowLoginPanel(true)}
-              className="rounded-full px-4 py-2 text-sm font-semibold text-slate-100 transition hover:bg-slate-900"
+              onClick={() => setAuthMode('login')}
+              className="rounded-lg px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               Log In
             </button>
             <button
               type="button"
-              className="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-slate-950 shadow-[0_14px_30px_rgba(6,182,212,0.4)] transition hover:bg-brand-400"
+              onClick={() => setAuthMode('signup')}
+              className="rounded-lg bg-white px-4 py-2 text-sm font-semibold text-[#0b3c50] transition hover:shadow-md"
             >
-              Create Free Account
+              Sign Up
             </button>
           </div>
-        </header>
+        </div>
+      </header>
+
+      <div className="mx-auto flex min-h-[calc(100vh-64px)] max-w-6xl flex-col px-4 py-8 sm:px-6 lg:px-10">
 
         <main className="grid flex-1 gap-8 md:grid-cols-[minmax(0,1.6fr)_minmax(0,1.1fr)] md:items-start">
           <section>

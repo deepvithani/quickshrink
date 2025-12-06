@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { FaGoogle, FaFacebookF, FaTwitter, FaMicrosoft } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import loginbg from './assets/loginback.jpg'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000'
 
@@ -38,6 +39,7 @@ function App() {
   const [isSubmittingShort, setIsSubmittingShort] = useState(false)
   const [shortError, setShortError] = useState('')
   const [shortUrl, setShortUrl] = useState('')
+  const [shortQrSvg, setShortQrSvg] = useState("")
 
   // Standalone QR state
   const [qrUrl, setQrUrl] = useState('')
@@ -49,6 +51,7 @@ function App() {
     event.preventDefault()
     setShortError('')
     setShortUrl('')
+    setShortQrSvg("")
 
     const validated = validateUrl(longUrl)
     if (typeof validated === 'string' && validated.startsWith('http') === false) {
@@ -78,6 +81,7 @@ function App() {
 
       const payload = await response.json()
       setShortUrl(payload.shortUrl)
+      setShortQrSvg(payload.qrCodeSvg)
     } catch (err) {
       setShortError(err.message || 'Unexpected error, please try again.')
     } finally {
@@ -114,8 +118,8 @@ function App() {
       }
 
       const payload = await response.json()
-      if (payload.qrCodeSvg) {
-        setQrSvg(payload.qrCodeSvg)
+      if (payload.qrSvg) {
+        setQrSvg(payload.qrSvg)
       }
     } catch (err) {
       setQrError(err.message || 'Unexpected error, please try again.')
@@ -305,22 +309,7 @@ function App() {
               <SocialRow />
             </div>
 
-            <div className="relative overflow-hidden bg-gradient-to-b from-[#0c7ea3] via-[#0b5f88] to-[#063b58] text-white">
-              <div className="absolute inset-0 opacity-30" />
-              <div className="relative flex h-full flex-col items-center justify-center px-6 py-10 text-center sm:px-8">
-                <div className="mb-6 flex h-64 w-64 items-center justify-center rounded-full bg-white/10 backdrop-blur">
-                  <div className="h-44 w-44 rounded-full bg-white/20 backdrop-blur" />
-                </div>
-                <h3 className="text-2xl font-bold">
-                  {isLogin ? 'Welcome Back!' : 'Amplify Your Success'}
-                </h3>
-                <p className="mt-3 max-w-md text-sm text-white/80">
-                  {isLogin
-                    ? 'Your dashboard is waiting—shorten, track, and share smarter.'
-                    : 'Create data-driven shortened links and branded QR codes with QuickShrink.'}
-                </p>
-              </div>
-            </div>
+            <div className="relative h-full w-full" style={{ backgroundImage: `url(${loginbg})`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
           </div>
         </div>
       </div>
@@ -361,7 +350,7 @@ function App() {
 
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_20%_20%,rgba(6,182,212,0.15),transparent_35%),radial-gradient(circle_at_80%_30%,rgba(56,189,248,0.12),transparent_35%),radial-gradient(circle_at_20%_80%,rgba(14,165,233,0.08),transparent_30%)]" />
 
-      <header className="sticky top-0 z-30 w-full bg-[#0b3c50] text-white shadow-lg">
+      <header className="sticky top-0 z-30 w-full">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <span className="text-3xl font-black tracking-[0.18em] text-white">QUICKSHRINK</span>
@@ -468,51 +457,33 @@ function App() {
               ) : (
                 <form onSubmit={handleQrSubmit} className="space-y-4">
                   <div className="space-y-2">
-                    <label
-                      htmlFor="qr-url"
-                      className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400"
-                    >
-                      Enter your QR Code destination
+                    <label className="block text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                      Enter URL for QR Code
                     </label>
-                    <div className="relative">
-                      <input
-                        id="qr-url"
-                        type="url"
-                        required
-                        value={qrUrl}
-                        onChange={(event) => setQrUrl(event.target.value)}
-                        placeholder="https://example.com/my-long-url"
-                        className="block w-full rounded-2xl border border-slate-800/90 bg-slate-900/50 px-4 py-3.5 text-sm text-slate-100 shadow-inner outline-none ring-2 ring-transparent transition focus:border-brand-500/60 focus:ring-brand-500/30"
-                      />
-                      <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center">
-                        <span className="rounded-full bg-slate-900/80 px-2.5 py-1 text-[0.65rem] font-medium uppercase tracking-[0.18em] text-slate-400 ring-1 ring-slate-800">
-                          Required
-                        </span>
-                      </div>
-                    </div>
+                    <input
+                      type="url"
+                      required
+                      value={qrUrl}
+                      onChange={(e) => setQrUrl(e.target.value)}
+                      placeholder="https://example.com"
+                      className="block w-full rounded-2xl border border-slate-800 bg-slate-900 px-4 py-3.5 text-sm text-slate-100"
+                    />
                   </div>
+
+                  {qrError && <p className="text-red-400 text-sm">{qrError}</p>}
 
                   <button
                     type="submit"
-                    disabled={isSubmittingQr}
-                    className="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(8,145,178,0.45)] transition hover:bg-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none"
+                    className="w-full rounded-xl bg-brand-500 px-4 py-3 font-semibold"
                   >
-                    {isSubmittingQr ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950" />
-                        <span>Creating your QR code…</span>
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-2">
-                        <span>Get your QR Code for free</span>
-                      </span>
-                    )}
+                    {isSubmittingQr ? "Generating..." : "Generate QR"}
                   </button>
 
-                  {qrError && (
-                    <div className="mt-2 rounded-2xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-xs text-red-200">
-                      {qrError}
-                    </div>
+                  {qrSvg && (
+                    <div
+                      className="bg-white p-4 rounded"
+                      dangerouslySetInnerHTML={{ __html: qrSvg }}
+                    />
                   )}
                 </form>
               )}
@@ -520,6 +491,18 @@ function App() {
           </section>
 
           <aside className="space-y-4 md:space-y-6">
+            {/* Show QR image before result for SHORT_LINK */}
+            {activeTab === TABS.SHORT_LINK && shortQrSvg && (
+              <div className="flex justify-center mb-3">
+                <div className="rounded-2xl bg-white p-3 shadow-md" dangerouslySetInnerHTML={{ __html: shortQrSvg }} />
+              </div>
+            )}
+            {/* Show QR image before result for QR_CODE */}
+            {activeTab === TABS.QR_CODE && qrSvg && (
+              <div className="flex justify-center mb-3">
+                <div className="bg-white p-4 rounded" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+              </div>
+            )}
             {activeTab === TABS.SHORT_LINK ? (
               <div className="rounded-3xl border border-slate-800/80 bg-slate-950/60 p-5 shadow-soft sm:p-6">
                 <div className="mb-3 flex items-center justify-between gap-2">
@@ -548,6 +531,12 @@ function App() {
                         ⧉
                       </span>
                     </button>
+                    {shortQrSvg && (
+                      <div className="mt-4 flex flex-col items-center justify-center">
+                        <div className="rounded-2xl bg-white p-3 shadow-md" dangerouslySetInnerHTML={{ __html: shortQrSvg }} />
+                        <span className="mt-2 text-xs text-slate-400">Scan QR or download</span>
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 text-sm text-slate-500">
@@ -581,7 +570,7 @@ function App() {
                     </div>
                     <div className="flex justify-center">
                       <div
-                        className="inline-flex rounded-2xl bg-white p-3 shadow-md"
+                        className="bg-white p-4 rounded"
                         // eslint-disable-next-line react/no-danger
                         dangerouslySetInnerHTML={{ __html: qrSvg }}
                       />

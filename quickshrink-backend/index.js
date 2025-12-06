@@ -5,7 +5,12 @@ import { customAlphabet } from "nanoid";
 import QRCode from "qrcode";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: true, // Allow all origins in development
+  methods: ["GET", "POST"],
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(express.json());
 
 const PORT = 5000;
@@ -47,7 +52,7 @@ const validateUrl = (value) => {
   return { ok: true, value: parsed.toString() };
 };
 
-// API to shorten URL (no QR generation here)
+// API to shorten URL (with QR generation and DB storage)
 app.post("/api/shorten", async (req, res) => {
   try {
     const { url, alias } = req.body;
@@ -58,7 +63,6 @@ app.post("/api/shorten", async (req, res) => {
     }
 
     const normalizedUrl = result.value;
-
     const trimmedAlias = typeof alias === "string" ? alias.trim() : "";
     const shortCode = trimmedAlias !== "" ? trimmedAlias : nanoid();
 
@@ -66,21 +70,25 @@ app.post("/api/shorten", async (req, res) => {
       "SELECT id FROM links WHERE short_code = ?",
       [shortCode]
     );
-
     if (existing.length > 0) {
       return res.status(400).json({ message: "Alias already taken!" });
     }
 
-    await pool.query(
-      "INSERT INTO links (original_url, short_code) VALUES (?, ?)",
-      [normalizedUrl, shortCode]
-    );
-
+    // Create the final short URL
     const shortUrl = `http://localhost:${PORT}/${shortCode}`;
+    // Generate QR Code SVG for the short URL
+    const qrCodeSvg = await QRCode.toString(shortUrl, { type: "svg" });
+
+    // Save with the QR code SVG as well
+    await pool.query(
+      "INSERT INTO links (original_url, short_code, qr_code) VALUES (?, ?, ?)",
+      [normalizedUrl, shortCode, qrCodeSvg]
+    );
 
     return res.json({
       shortCode,
       shortUrl,
+      qrCodeSvg,
     });
   } catch (err) {
     console.error("Error:", err);
@@ -100,11 +108,16 @@ app.post("/api/qr", async (req, res) => {
 
     const normalizedUrl = result.value;
 
-    const qrCodeSvg = await QRCode.toString(normalizedUrl, { type: "svg" });
+    // Generate SVG string
+    const svg = await QRCode.toString(normalizedUrl, { type: "svg" });
 
-    return res.json({
-      qrCodeSvg,
-    });
+    // Save in database
+    const [insertResult] = await pool.execute(
+      "INSERT INTO links (original_url, qr_code) VALUES (?, ?)",
+      [normalizedUrl, svg]
+    );
+
+    res.json({ id: insertResult.insertId, qrSvg: svg });
   } catch (err) {
     console.error("QR error:", err);
     res.status(500).json({ message: "Unable to generate QR code" });

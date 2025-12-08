@@ -76,14 +76,12 @@ app.post("/api/shorten", async (req, res) => {
 
     // Create the final short URL
     const shortUrl = `http://localhost:${PORT}/${shortCode}`;
-    // Generate QR Code SVG for the short URL (for display only, not saved)
-    const qrCodeSvg = await QRCode.toString(shortUrl, { type: "svg" });
 
-    // Save only the short_code, all other fields set to NULL
+    // Persist the original URL so redirects work
     try {
       await pool.query(
-        "INSERT INTO links (short_code, original_url, qr_code) VALUES (?, NULL, NULL)",
-        [shortCode]
+        "INSERT INTO links (short_code, original_url, qr_code) VALUES (?, ?, NULL)",
+        [shortCode, normalizedUrl]
       );
     } catch (dbErr) {
       // If constraint error, try to alter table and retry
@@ -93,8 +91,8 @@ app.post("/api/shorten", async (req, res) => {
           await pool.execute("ALTER TABLE links MODIFY original_url TEXT NULL");
           // Retry the insert
           await pool.query(
-            "INSERT INTO links (short_code, original_url, qr_code) VALUES (?, NULL, NULL)",
-            [shortCode]
+            "INSERT INTO links (short_code, original_url, qr_code) VALUES (?, ?, NULL)",
+            [shortCode, normalizedUrl]
           );
         } catch (alterErr) {
           console.error("Schema update error:", alterErr);
@@ -107,8 +105,7 @@ app.post("/api/shorten", async (req, res) => {
 
     return res.json({
       shortCode,
-      shortUrl,
-      qrCodeSvg,
+      shortUrl
     });
   } catch (err) {
     console.error("Shorten error:", err);
@@ -195,6 +192,10 @@ app.get("/:code", async (req, res) => {
   if (rows.length === 0) return res.status(404).send("Short URL not found");
 
   const url = rows[0].original_url;
+
+  if (!url) {
+    return res.status(404).send("Short URL not found");
+  }
 
   await pool.query(
     "UPDATE links SET clicks = clicks + 1, last_visited = NOW() WHERE short_code = ?",

@@ -81,7 +81,7 @@ function App() {
 
       const payload = await response.json()
       setShortUrl(payload.shortUrl)
-      setShortQrSvg(payload.qrCodeSvg)
+      setShortQrSvg(payload.qrCodeSvg || '')
     } catch (err) {
       setShortError(err.message || 'Unexpected error, please try again.')
     } finally {

@@ -76,14 +76,34 @@ app.post("/api/shorten", async (req, res) => {
 
     // Create the final short URL
     const shortUrl = `http://localhost:${PORT}/${shortCode}`;
-    // Generate QR Code SVG for the short URL
+    // Generate QR Code SVG for the short URL (for display only, not saved)
     const qrCodeSvg = await QRCode.toString(shortUrl, { type: "svg" });
 
-    // Save with the QR code SVG as well
-    await pool.query(
-      "INSERT INTO links (original_url, short_code, qr_code) VALUES (?, ?, ?)",
-      [normalizedUrl, shortCode, qrCodeSvg]
-    );
+    // Save only the short_code, all other fields set to NULL
+    try {
+      await pool.query(
+        "INSERT INTO links (short_code, original_url, qr_code) VALUES (?, NULL, NULL)",
+        [shortCode]
+      );
+    } catch (dbErr) {
+      // If constraint error, try to alter table and retry
+      if (dbErr.code === 'ER_BAD_NULL_ERROR' || dbErr.message?.includes('NOT NULL')) {
+        console.log("Attempting to update schema to allow NULL for original_url...");
+        try {
+          await pool.execute("ALTER TABLE links MODIFY original_url TEXT NULL");
+          // Retry the insert
+          await pool.query(
+            "INSERT INTO links (short_code, original_url, qr_code) VALUES (?, NULL, NULL)",
+            [shortCode]
+          );
+        } catch (alterErr) {
+          console.error("Schema update error:", alterErr);
+          throw dbErr; // Throw original error
+        }
+      } else {
+        throw dbErr;
+      }
+    }
 
     return res.json({
       shortCode,
@@ -91,8 +111,13 @@ app.post("/api/shorten", async (req, res) => {
       qrCodeSvg,
     });
   } catch (err) {
-    console.error("Error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("Shorten error:", err);
+    console.error("Shorten error message:", err.message);
+    console.error("Shorten error code:", err.code);
+    res.status(500).json({ 
+      message: "Server error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 
@@ -100,6 +125,10 @@ app.post("/api/shorten", async (req, res) => {
 app.post("/api/qr", async (req, res) => {
   try {
     const { url } = req.body;
+
+    if (!url) {
+      return res.status(400).json({ message: "URL is required" });
+    }
 
     const result = validateUrl(url);
     if (!result.ok) {
@@ -111,16 +140,46 @@ app.post("/api/qr", async (req, res) => {
     // Generate SVG string
     const svg = await QRCode.toString(normalizedUrl, { type: "svg" });
 
-    // Save in database
-    const [insertResult] = await pool.execute(
-      "INSERT INTO links (original_url, qr_code) VALUES (?, ?)",
-      [normalizedUrl, svg]
-    );
-
-    res.json({ id: insertResult.insertId, qrSvg: svg });
+    // Save only the QR code, all other fields set to NULL
+    // Try to update schema first if needed (graceful handling)
+    try {
+      const [insertResult] = await pool.execute(
+        "INSERT INTO links (qr_code, original_url, short_code) VALUES (?, NULL, NULL)",
+        [svg]
+      );
+      res.json({ id: insertResult.insertId, qrSvg: svg });
+    } catch (dbErr) {
+      // If constraint error, try to alter table and retry
+      if (
+        dbErr.code === 'ER_BAD_NULL_ERROR' ||
+        dbErr.message?.includes('NOT NULL')
+      ) {
+        console.log("Attempting to update schema to allow NULL for original_url and short_code...");
+        try {
+          await pool.execute("ALTER TABLE links MODIFY original_url TEXT NULL");
+          await pool.execute("ALTER TABLE links MODIFY short_code VARCHAR(100) NULL");
+          // Retry the insert
+          const [insertResult] = await pool.execute(
+            "INSERT INTO links (qr_code, original_url, short_code) VALUES (?, NULL, NULL)",
+            [svg]
+          );
+          res.json({ id: insertResult.insertId, qrSvg: svg });
+        } catch (alterErr) {
+          console.error("Schema update error:", alterErr);
+          throw dbErr; // Throw original error
+        }
+      } else {
+        throw dbErr;
+      }
+    }
   } catch (err) {
     console.error("QR error:", err);
-    res.status(500).json({ message: "Unable to generate QR code" });
+    console.error("QR error message:", err.message);
+    console.error("QR error code:", err.code);
+    res.status(500).json({ 
+      message: "Unable to generate QR code",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
   }
 });
 

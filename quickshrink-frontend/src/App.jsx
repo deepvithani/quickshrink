@@ -479,30 +479,12 @@ function App() {
                     {isSubmittingQr ? "Generating..." : "Generate QR"}
                   </button>
 
-                  {qrSvg && (
-                    <div
-                      className="bg-white p-4 rounded"
-                      dangerouslySetInnerHTML={{ __html: qrSvg }}
-                    />
-                  )}
                 </form>
               )}
             </div>
           </section>
 
           <aside className="space-y-4 md:space-y-6">
-            {/* Show QR image before result for SHORT_LINK */}
-            {activeTab === TABS.SHORT_LINK && shortQrSvg && (
-              <div className="flex justify-center mb-3">
-                <div className="rounded-2xl bg-white p-3 shadow-md" dangerouslySetInnerHTML={{ __html: shortQrSvg }} />
-              </div>
-            )}
-            {/* Show QR image before result for QR_CODE */}
-            {activeTab === TABS.QR_CODE && qrSvg && (
-              <div className="flex justify-center mb-3">
-                <div className="bg-white p-4 rounded" dangerouslySetInnerHTML={{ __html: qrSvg }} />
-              </div>
-            )}
             {activeTab === TABS.SHORT_LINK ? (
               <div className="rounded-3xl border border-slate-800/80 bg-slate-950/60 p-5 shadow-soft sm:p-6">
                 <div className="mb-3 flex items-center justify-between gap-2">
@@ -531,12 +513,6 @@ function App() {
                         ⧉
                       </span>
                     </button>
-                    {shortQrSvg && (
-                      <div className="mt-4 flex flex-col items-center justify-center">
-                        <div className="rounded-2xl bg-white p-3 shadow-md" dangerouslySetInnerHTML={{ __html: shortQrSvg }} />
-                        <span className="mt-2 text-xs text-slate-400">Scan QR or download</span>
-                      </div>
-                    )}
                   </div>
                 ) : (
                   <div className="space-y-3 text-sm text-slate-500">
@@ -558,7 +534,10 @@ function App() {
                   </span>
                 </div>
 
-                {qrSvg ? (
+                {(() => {
+                  const qrResultSvg = activeTab === TABS.SHORT_LINK ? shortQrSvg : qrSvg
+                  const qrBoxStyle = { width: 220, height: 220 }
+                  return qrResultSvg ? (
                   <div className="space-y-3 rounded-2xl border border-slate-800/80 bg-slate-950/80 p-4">
                     <div className="flex items-center justify-between gap-2">
                       <p className="text-xs font-medium uppercase tracking-[0.18em] text-slate-400">
@@ -571,12 +550,13 @@ function App() {
                     <div className="flex justify-center">
                       <div
                         className="bg-white p-4 rounded"
+                        style={qrBoxStyle}
                         // eslint-disable-next-line react/no-danger
-                        dangerouslySetInnerHTML={{ __html: qrSvg }}
+                        dangerouslySetInnerHTML={{ __html: qrResultSvg }}
                       />
                     </div>
                   </div>
-                ) : (
+                  ) : (
                   <div className="space-y-3 text-sm text-slate-500">
                     <p className="text-[0.82rem] text-slate-300">
                       Paste a destination URL on the QR tab and click{' '}
@@ -584,7 +564,8 @@ function App() {
                       to see it here.
                     </p>
                   </div>
-                )}
+                  )
+                })()}
               </div>
             )}
           </aside>

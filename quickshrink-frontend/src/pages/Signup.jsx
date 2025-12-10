@@ -4,7 +4,7 @@ import SocialRow from "../components/SocialRow";
 import loginbg from "../assets/loginback.jpg";
 
 const Signup = () => (
-  <div className="relative min-h-[calc(100vh-64px)] bg-slate-100 shadow-2xl">
+  <div className="relative min-h-screen bg-slate-100 shadow-2xl">
     <div className="absolute right-4 top-4 z-10">
       <Link
         to="/"
@@ -14,7 +14,7 @@ const Signup = () => (
         ✕
       </Link>
     </div>
-    <div className="grid min-h-[calc(100vh-64px)] gap-0 border-t border-slate-200 bg-white lg:grid-cols-[1.05fr_0.95fr]">
+    <div className="grid min-h-screen gap-0 bg-white lg:grid-cols-[1.05fr_0.95fr]">
       <div className="flex flex-col px-8 pb-12 pt-6 sm:px-12 sm:pt-10">
         <div className="mb-6 space-y-1">
           <h1 className="text-4xl font-black text-slate-800">Sign Up</h1>

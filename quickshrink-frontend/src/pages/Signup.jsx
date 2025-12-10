@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import AuthField from "../components/AuthField";
+import PasswordField from "../components/PasswordField";
 import SocialRow from "../components/SocialRow";
 import loginbg from "../assets/loginback.jpg";
 
@@ -29,13 +30,7 @@ const Signup = () => (
         <form className="space-y-4">
           <AuthField id="signup-name" label="Name" placeholder="Enter Full Name" />
           <AuthField id="signup-email" label="Email" placeholder="Enter Email Address" />
-          <AuthField
-            id="signup-password"
-            label="Password"
-            type="password"
-            placeholder="Enter Password"
-            rightIcon="👁"
-          />
+          <PasswordField id="signup-password" label="Password" placeholder="Enter Password" />
 
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-xs text-slate-600">

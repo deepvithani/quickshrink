@@ -25,7 +25,7 @@ const QrForm = ({
     <button
       type="submit"
       disabled={isSubmitting}
-      className="w-full rounded-xl bg-brand-500 px-4 py-3 font-semibold disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400"
+      className="w-full rounded-xl bg-brand-500 px-4 py-3 font-semibold text-slate-950 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400"
     >
       {isSubmitting ? "Generating..." : "Generate QR"}
     </button>

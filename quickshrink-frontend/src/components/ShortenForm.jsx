@@ -34,18 +34,9 @@ const ShortenForm = ({
     <button
       type="submit"
       disabled={isSubmitting}
-      className="inline-flex items-center justify-center rounded-2xl bg-brand-500 px-6 py-3.5 text-sm font-semibold text-slate-950 shadow-[0_18px_40px_rgba(8,145,178,0.45)] transition hover:bg-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400 disabled:shadow-none"
+      className="w-full rounded-xl bg-brand-500 px-4 py-3 font-semibold text-slate-950 transition hover:bg-brand-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-400"
     >
-      {isSubmitting ? (
-        <span className="inline-flex items-center gap-2">
-          <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-900/40 border-t-slate-950" />
-          <span>Getting your short link…</span>
-        </span>
-      ) : (
-        <span className="inline-flex items-center gap-2">
-          <span>Get your link for free</span>
-        </span>
-      )}
+      {isSubmitting ? "Getting your short link…" : "Get your link for free"}
     </button>
 
     {error && (

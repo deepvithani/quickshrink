@@ -8,9 +8,9 @@ const Loader = () => (
           QUICKSHRINK
         </p>
         <div className="flex items-center justify-center gap-3 text-4xl sm:text-5xl">
-          <span className="animate-pulse text-brand-200">⟮</span>
+          {/* <span className="animate-pulse text-brand-200">⟮</span> */}
           <span className="h-7 w-7 animate-spin rounded-full border-4 border-slate-800 border-t-brand-400" />
-          <span className="animate-pulse text-brand-200">⟯</span>
+          {/* <span className="animate-pulse text-brand-200">⟯</span> */}
         </div>
         <p className="text-xs uppercase tracking-[0.2em] text-slate-400 sm:text-sm">
           Crafting your experience

@@ -3,8 +3,46 @@ import AuthField from "../components/AuthField";
 import PasswordField from "../components/PasswordField";
 import SocialRow from "../components/SocialRow";
 import loginbg from "../assets/loginback.jpg";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const Login = () => (
+
+
+const Login = () => {
+
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  const handleLogin = async () => {
+    setError("");
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message);
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      navigate("/");
+    } catch {
+      setError("Something went wrong");
+    }
+  };
+
+  return (
   <div className="relative min-h-screen bg-slate-100 shadow-2xl">
     <div className="absolute right-4 top-4 z-10">
       <Link
@@ -28,8 +66,10 @@ const Login = () => (
         </div>
 
         <form className="space-y-4">
-          <AuthField id="login-email" label="Email" placeholder="Enter Email Address" />
-          <PasswordField id="login-password" label="Password" placeholder="Enter Password" />
+          <AuthField id="login-email" label="Email" placeholder="Enter Email Address"    value={email}
+  onChange={(e) => setEmail(e.target.value)}/>
+          <PasswordField id="login-password" label="Password" placeholder="Enter Password"   value={password}
+  onChange={(e) => setPassword(e.target.value)} />
 
           <div className="flex items-center justify-between text-sm text-slate-600">
             <label className="inline-flex items-center gap-2">
@@ -43,10 +83,12 @@ const Login = () => (
 
           <button
             type="button"
+            onClick={handleLogin}
             className="flex w-full items-center justify-center rounded bg-slate-400 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-500"
           >
             Log In
           </button>
+          {error && <p className="text-red-400 text-sm">{error}</p>}
         </form>
 
         <div className="my-6 flex items-center gap-4 text-sm font-semibold text-slate-500">
@@ -69,6 +111,7 @@ const Login = () => (
     </div>
   </div>
 );
+}
 
 export default Login;
 

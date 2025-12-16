@@ -1,7 +1,13 @@
 import { useState } from "react";
 import { LuEye, LuEyeOff } from "react-icons/lu";
 
-const PasswordField = ({ id, label, placeholder }) => {
+const PasswordField = ({
+  id,
+  label,
+  placeholder,
+  value,
+  onChange,
+}) => {
   const [show, setShow] = useState(false);
   const type = show ? "text" : "password";
 
@@ -10,13 +16,17 @@ const PasswordField = ({ id, label, placeholder }) => {
       <label htmlFor={id} className="text-sm font-semibold text-slate-700">
         {label}
       </label>
+
       <div className="relative">
         <input
           id={id}
           type={type}
           placeholder={placeholder}
+          value={value}
+          onChange={onChange}
           className="block w-full rounded border border-slate-300 bg-white px-3 py-3 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-200"
         />
+
         <button
           type="button"
           onClick={() => setShow((prev) => !prev)}
@@ -31,4 +41,3 @@ const PasswordField = ({ id, label, placeholder }) => {
 };
 
 export default PasswordField;
-

@@ -32,12 +32,14 @@ const Header = () => {
 
         <div className="flex items-center gap-3">
 
-          {/* PUBLIC LINK – ALWAYS */}
+          {/* HOME – ALWAYS VISIBLE */}
           <NavLink
-            to="/links"
-            className="rounded px-3 py-1 text-sm font-semibold text-white/80 hover:text-white"
+            to="/"
+            className=
+            "rounded-lg px-4 py-2 text-sm font-semibold transition"
+
           >
-            All Links
+            Home
           </NavLink>
 
           {!token ? (
@@ -58,9 +60,7 @@ const Header = () => {
             </>
           ) : (
             <>
-              <span className="text-sm font-semibold text-white/80">
-                Hi, {user?.name}
-              </span>
+
 
               <NavLink
                 to="/dashboard"
@@ -68,6 +68,9 @@ const Header = () => {
               >
                 Dashboard
               </NavLink>
+              <span className="text-sm  px-4 py-2 font-semibold text-white/80">
+                Hi, {user?.name}
+              </span>
 
               <button
                 onClick={handleLogout}
@@ -78,6 +81,7 @@ const Header = () => {
             </>
           )}
         </div>
+
 
       </div>
     </header>

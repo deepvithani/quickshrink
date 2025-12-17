@@ -132,7 +132,7 @@ const Home = () => {
           <div className="relative overflow-hidden rounded-3xl border border-slate-800/80 bg-slate-950/70 p-6 shadow-soft sm:p-8">
             <div className="pointer-events-none absolute inset-x-10 -top-32 -z-10 h-56 rounded-full bg-brand-500/20 blur-3xl" />
             <div className="mb-4 sm:mb-5" />
-            <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            {/* <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="rounded-xl bg-slate-900 p-5 text-white">
                 <p className="text-sm opacity-80">Total Links</p>
                 <p className="mt-2 text-3xl font-bold">{stats.totalLinks}</p>
@@ -147,7 +147,7 @@ const Home = () => {
                 <p className="text-sm opacity-80">Total Clicks</p>
                 <p className="mt-2 text-3xl font-bold">{stats.totalClicks}</p>
               </div>
-            </div>
+            </div> */}
             <Tabs activeTab={activeTab} onChange={setActiveTab} tabs={TABS} />
 
             {activeTab === TABS.SHORT_LINK ? (

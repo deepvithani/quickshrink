@@ -96,7 +96,7 @@ const Home = () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/qr`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${localStorage.getItem("token")}`, },
         body: JSON.stringify({ url: normalizedUrl }),
       });
 

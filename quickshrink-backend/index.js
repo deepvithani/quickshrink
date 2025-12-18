@@ -176,9 +176,9 @@ app.post("/api/login", async (req, res) => {
     const token = jwt.sign(
       { id: user.id },
       JWT_SECRET,
-       { expiresIn: "7d" }
-      );
-    
+      { expiresIn: "7d" }
+    );
+
 
     res.json({
       token,
@@ -232,9 +232,9 @@ app.post("/api/shorten", authMiddleware, async (req, res) => {
           await pool.execute("ALTER TABLE links MODIFY original_url TEXT NULL");
           // Retry the insert
           await pool.query(
-              "INSERT INTO links (short_code, original_url, qr_code, user_id) VALUES (?, ?, NULL, ?)",
-             [shortCode, normalizedUrl, req.userId]
-            );
+            "INSERT INTO links (short_code, original_url, qr_code, user_id) VALUES (?, ?, NULL, ?)",
+            [shortCode, normalizedUrl, req.userId]
+          );
         } catch (alterErr) {
           console.error("Schema update error:", alterErr);
           throw dbErr; // Throw original error
@@ -260,7 +260,7 @@ app.post("/api/shorten", authMiddleware, async (req, res) => {
 });
 
 // Dedicated API to generate QR code for any URL (short or long)
-app.post("/api/qr", async (req, res) => {
+app.post("/api/qr", authMiddleware, async (req, res) => {
   try {
     const { url } = req.body;
 
@@ -281,11 +281,16 @@ app.post("/api/qr", async (req, res) => {
     // Save only the QR code, all other fields set to NULL
     // Try to update schema first if needed (graceful handling)
     try {
+      //  SAVE QR WITH USER ID (ONLY THIS QUERY)
       const [insertResult] = await pool.execute(
-        "INSERT INTO links (qr_code, original_url, short_code) VALUES (?, NULL, NULL)",
-        [svg]
+        "INSERT INTO links (original_url, qr_code, short_code, user_id) VALUES (?, ?, NULL, ?)",
+        [normalizedUrl, svg, req.userId]
       );
-      res.json({ id: insertResult.insertId, qrSvg: svg });
+
+      res.json({
+        id: insertResult.insertId,
+        qrSvg: svg
+      });
     } catch (dbErr) {
       // If constraint error, try to alter table and retry
       if (
@@ -372,6 +377,27 @@ app.delete("/api/links/:id", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+
+app.get("/qr/:id", async (req, res) => {
+  const { id } = req.params;
+
+  const [rows] = await pool.query(
+    "SELECT original_url FROM links WHERE id = ?",
+    [id]
+  );
+
+  if (rows.length === 0 || !rows[0].original_url) {
+    return res.status(404).send("QR not found");
+  }
+
+  await pool.query(
+    "UPDATE links SET clicks = clicks + 1 WHERE id = ?",
+    [id]
+  );
+
+  res.redirect(rows[0].original_url);
+});
+
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);

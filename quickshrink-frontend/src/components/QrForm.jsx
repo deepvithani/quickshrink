@@ -20,7 +20,7 @@ const QrForm = ({
       />
     </div>
 
-    {error && <p className="text-red-400 text-sm">{error}</p>}
+    
 
     <button
       type="submit"
@@ -29,6 +29,12 @@ const QrForm = ({
     >
       {isSubmitting ? "Generating..." : "Generate QR"}
     </button>
+    
+    {error && (
+      <div className="mt-2 rounded-2xl border border-red-500/30 bg-red-500/5 px-4 py-3 text-xs text-red-200">
+        {error}
+      </div>
+    )}
   </form>
 );
 

@@ -77,66 +77,70 @@ const Dashboard = () => {
             </thead>
 
             <tbody>
-  {links.map((link) => {
-    const shortUrl = `${API_BASE_URL}/${link.short_code}`;
+              {links.map((link) => {
 
-    return (
-      <tr
-        key={link.id}
-        className="hover:bg-slate-800 transition"
-      >
-        {/* Original URL */}
-        <td className="border border-slate-700 p-3 break-all text-slate-300">
-          {link.original_url}
-        </td>
+                const hasShort = Boolean(link.short_code);
 
-        {/* Short URL */}
-        <td className="border border-slate-700 p-3">
-          <a
-            href={shortUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-cyan-400 underline"
-          >
-            {link.short_code}
-          </a>
-        </td>
+                const qrTargetUrl = hasShort
+                  ? `${API_BASE_URL}/${link.short_code}`
+                  : link.original_url;
 
-        {/* ✅ QR Code */}
-        <td className="border border-slate-700 p-3 text-center">
-          <a
-            href={shortUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
-                shortUrl
-              )}`}
-              alt="QR Code"
-              className="mx-auto h-20 rounded bg-white p-1"
-            />
-          </a>
-        </td>
+                return (
+                  <tr key={link.id} className="hover:bg-slate-800 transition">
 
-        {/* Clicks */}
-        <td className="border border-slate-700 p-3 text-center">
-          {link.clicks || 0}
-        </td>
+                    {/* Original URL */}
+                    <td className="border border-slate-700 p-3 break-all text-slate-300">
+                      {link.original_url || "-"}
+                    </td>
 
-        {/* Actions */}
-        <td className="border border-slate-700 p-3 text-center">
-          <button
-            onClick={() => handleDelete(link.id)}
-            className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
-          >
-            Delete
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+                    {/* Short URL */}
+                    <td className="border border-slate-700 p-3">
+                      {hasShort ? (
+                        <a
+                          href={qrTargetUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-cyan-400 underline"
+                        >
+                          {link.short_code}
+                        </a>
+                      ) : (
+                        <span className="text-slate-500">-</span>
+                      )}
+                    </td>
+
+                    {/* QR Code */}
+                    <td className="border border-slate-700 p-3 text-center">
+                      <a href={qrTargetUrl} target="_blank" rel="noreferrer">
+                        <img
+                          src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
+                            qrTargetUrl
+                          )}`}
+                          alt="QR Code"
+                          className="mx-auto h-20 rounded bg-white p-1"
+                        />
+                      </a>
+                    </td>
+
+                    {/* Clicks */}
+                    <td className="border border-slate-700 p-3 text-center">
+                      {link.clicks || 0}
+                    </td>
+
+                    {/* Actions */}
+                    <td className="border border-slate-700 p-3 text-center">
+                      <button
+                        onClick={() => handleDelete(link.id)}
+                        className="rounded bg-red-600 px-3 py-1 text-sm text-white hover:bg-red-700"
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+
 
           </table>
         </div>

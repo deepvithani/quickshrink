@@ -67,9 +67,9 @@ const Dashboard = () => {
                 <th className="border border-slate-700 p-3 text-center">
                   QR Code
                 </th>
-                <th className="border border-slate-700 p-3 text-center">
+                {/* <th className="border border-slate-700 p-3 text-center">
                   Clicks
-                </th>
+                </th> */}
                 <th className="border border-slate-700 p-3 text-center">
                   Actions
                 </th>
@@ -113,13 +113,13 @@ const Dashboard = () => {
                     <td className="border border-slate-700 p-3 text-center">
   {!link.short_code ? (
     <a
-      href={`${API_BASE_URL}/qr/${link.id}`}
+      href={qrTargetUrl}
       target="_blank"
       rel="noreferrer"
     >
       <img
         src={`https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(
-          `${API_BASE_URL}/qr/${link.id}`
+          qrTargetUrl
         )}`}
         alt="QR Code"
         className="mx-auto h-20 rounded bg-white p-1"
@@ -132,9 +132,9 @@ const Dashboard = () => {
 
 
                     {/* Clicks */}
-                    <td className="border border-slate-700 p-3 text-center">
+                    {/* <td className="border border-slate-700 p-3 text-center">
                       {link.clicks || 0}
-                    </td>
+                    </td> */}
 
                     {/* Actions */}
                     <td className="border border-slate-700 p-3 text-center">

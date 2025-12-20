@@ -33,3 +33,42 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
 }
+
+.buttons-container {
+  margin-top: auto; /* Ensures the buttons stick at the bottom */
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+
+.buttons-container button {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 30px;
+}
+.card {
+  position: relative;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+}
+
+.card:hover {
+  transform: scale(1.05);  /* Scale up slightly */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+/* This is for larger screens, the cards will be in a 3-column grid */
+@media screen and (min-width: 1024px) {
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}
+
+/* This will ensure that the cards stack in a single column on mobile */
+@media screen and (max-width: 768px) {
+  .cards-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}

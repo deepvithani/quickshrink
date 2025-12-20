@@ -7,7 +7,15 @@ import QrResult from "../components/QrResult";
 import { validateUrl } from "../utils/validateUrl";
 import { useEffect } from "react";
 import { FaCheckCircle } from "react-icons/fa";
-
+import UseCasesSlider from "../components/UseCasesSlider";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation } from "swiper/modules";
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import "swiper/css";
+import "swiper/css/navigation";
+import { FaQuoteLeft } from 'react-icons/fa';
+import Dashimag from '../../src/assets/dashboard.png'
+import Footer from "../components/Footer";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -34,6 +42,23 @@ const Home = () => {
     totalUsers: 0,
     totalClicks: 0,
   });
+  const testimonials = [
+    {
+      quote:
+        "When it came to deciding on a platform to use for generating all of our QR Codes, there was a general consensus among the team—of course we should use Bitly! We didn’t even give it a second thought.",
+      name: "Melody Park",
+      role: "Marketing Lead at Smalls",
+      image: "/images/user1.jpg",
+    },
+    {
+      quote:
+        "When customers receive a status update from us, they can click on our encrypted link through the Bitly short link and directly view their order without having to log in, which is a smoother user experience and still keeps their information secure.",
+      name: "Phil Gergen",
+      role: "Chief Information Officer at Koozie Group",
+      image: "/images/user2.jpg",
+    },
+  ];
+
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/stats`)
@@ -128,6 +153,7 @@ const Home = () => {
   };
 
   return (
+    <>
     <div className="flex min-h-[calc(100vh-64px)] flex-col px-6 py-8 sm:px-8 lg:px-12">
       <section className="mt-6 mb-12 text-center">
         <h1 className="mb-4 text-4xl font-extrabold text-white sm:text-5xl">
@@ -297,15 +323,22 @@ md:items-start">
 
           {/* Cards */}
           {/* Cards */}
-          <div className="grid gap-6 md:grid-cols-3 items-stretch">
+          <div
+            className="
+    grid gap-6 items-stretch
+    grid-cols-3
+    max-[1080px]:grid-cols-1
+  "
+          >
+
 
             {/* URL SHORTENER */}
             <div
               onMouseEnter={() => setActiveCard("url")}
               onMouseLeave={() => setActiveCard(null)}
               className={`
-                relative h-[420px] overflow-hidden rounded-3xl bg-white p-8
-                transition-all duration-300 ease-out
+         relative h-[420px] overflow-hidden rounded-3xl bg-white p-8
+                transition-all duration-300 ease-out card
                 ${activeCard === "url" ? "shadow-2xl scale-105 z-10" : ""}
                 ${activeCard && activeCard !== "url" ? "opacity-50 scale-95" : ""}
               `}
@@ -348,9 +381,14 @@ md:items-start">
                 </ul>
 
 
-                <button className="mt-5 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700">
-                  Get started
-                </button>
+                <div className="pt-3 flex flex-col gap-3 buttons-container">
+                  <button className="rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+                    Get started for free
+                  </button>
+                  <button className="rounded-full border border-blue-600 px-6 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50">
+                    Learn more
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -359,8 +397,8 @@ md:items-start">
               onMouseEnter={() => setActiveCard("qr")}
               onMouseLeave={() => setActiveCard(null)}
               className={`
-      relative h-[420px] overflow-hidden rounded-3xl bg-white p-8
-      transition-all duration-300 ease-out
+relative h-[420px] overflow-hidden rounded-3xl bg-white p-8
+                transition-all duration-300 ease-out card
       ${activeCard === "qr" ? "shadow-2xl scale-110 z-10" : ""}
       ${activeCard && activeCard !== "qr" ? "opacity-50 scale-95" : ""}
     `}
@@ -404,7 +442,7 @@ md:items-start">
                   </li>
                 </ul>
 
-                <div className="mt-6 flex flex-col gap-3">
+                <div className="pt-3 flex flex-col gap-3 buttons-container">
                   <button className="rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700">
                     Get started for free
                   </button>
@@ -420,8 +458,8 @@ md:items-start">
               onMouseEnter={() => setActiveCard("lp")}
               onMouseLeave={() => setActiveCard(null)}
               className={`
-    relative h-[420px] overflow-hidden rounded-3xl bg-white p-8
-    transition-all duration-300 ease-out
+relative h-[420px] overflow-hidden rounded-3xl bg-white p-8
+                transition-all duration-300 ease-out card
     ${activeCard === "lp" ? "shadow-2xl scale-110 z-10" : ""}
     ${activeCard && activeCard !== "lp" ? "opacity-50 scale-95" : ""}
     `}
@@ -443,7 +481,7 @@ md:items-start">
               <div
                 className={`
         absolute inset-x-0 bottom-0 px-8 pb-8
-        transition-all duration-300 ease-out
+        transition-all duration-300 ease-out  
         ${activeCard === "lp" ? "max-h-56 opacity-100" : "max-h-0 opacity-0"}
         overflow-hidden
       `}
@@ -463,9 +501,14 @@ md:items-start">
                   </li>
                 </ul>
 
-                <button className="mt-5 rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700">
-                  Learn more
-                </button>
+                <div className="pt-3 flex flex-col gap-3 buttons-container">
+                  <button className="rounded-full bg-blue-600 px-6 py-3 text-sm font-semibold text-white hover:bg-blue-700">
+                    Get started for free
+                  </button>
+                  <button className="rounded-full border border-blue-600 px-6 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50">
+                    Learn more
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -474,11 +517,182 @@ md:items-start">
 
         </div>
       </section>
+      {/* STATS SECTION */}
+      <section className="mt-24 bg-[#faf7f2] py-24">
+        <div className="mx-auto max-w-7xl px-6">
+
+          {/* Heading */}
+          <h2 className="mb-16 text-center text-4xl font-extrabold text-[#0a2540] sm:text-5xl">
+            Adopted and loved by millions of users for <br className="hidden sm:block" />
+            over a decade
+          </h2>
+
+          {/* Cards Grid */}
+          <div
+            className="
+        grid gap-6
+        grid-cols-4
+        max-[1080px]:grid-cols-2
+        max-[640px]:grid-cols-1
+      "
+          >
+            {/* CARD 1 */}
+            <div className="rounded-3xl bg-[#efece6] p-8">
+              <div className="mb-6 text-3xl">🌍</div>
+              <p className="mb-2 text-5xl font-extrabold text-[#0a2540]">600K+</p>
+              <p className="text-lg text-[#0a2540]">
+                Global paying customers
+              </p>
+            </div>
+
+            {/* CARD 2 */}
+            <div className="rounded-3xl bg-[#efece6] p-8">
+              <div className="mb-6 text-3xl">🔗</div>
+              <p className="mb-2 text-5xl font-extrabold text-[#0a2540]">256M</p>
+              <p className="text-lg text-[#0a2540]">
+                Links & QR Codes created monthly
+              </p>
+            </div>
+
+            {/* CARD 3 */}
+            <div className="rounded-3xl bg-[#efece6] p-8">
+              <div className="mb-6 text-3xl">❤️</div>
+              <p className="mb-2 text-5xl font-extrabold text-[#0a2540]">800+</p>
+              <p className="text-lg text-[#0a2540]">
+                App integrations
+              </p>
+            </div>
+
+            {/* CARD 4 */}
+            <div className="rounded-3xl bg-[#efece6] p-8">
+              <div className="mb-6 text-3xl">🎯</div>
+              <p className="mb-2 text-5xl font-extrabold text-[#0a2540]">10B</p>
+              <p className="text-lg text-[#0a2540]">
+                Connections (clicks & scans monthly)
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BITLY STYLE TESTIMONIAL SLIDER */}
+      <section className="mt-24 bg-[#f60] py-24">
+        <div className="mx-auto max-w-6xl px-6 text-center">
+
+          {/* Heading */}
+          <h2 className="mb-16 text-4xl font-extrabold text-[#0a2540]">
+            What our customers are saying
+          </h2>
+
+          {/* Slider */}
+          <Swiper
+            modules={[Navigation]}
+            navigation={{
+              nextEl: ".testimonial-next",
+              prevEl: ".testimonial-prev",
+            }}
+            slidesPerView={1}
+            loop
+            className="relative"
+          >
+            {testimonials.map((t, i) => (
+              <SwiperSlide key={i}>
+                <div className="relative mx-auto max-w-4xl rounded-[32px] bg-[#fffaf4] px-12 py-14 text-left shadow-xl">
+
+                  {/* Quote icon */}
+                  <FaQuoteLeft className="mb-2 text-4xl text-[#f60]" />
+
+                  {/* Quote */}
+                  <p className="text-xl leading-relaxed text-[#0a2540]">
+                    {t.quote}
+                  </p>
+
+                  {/* User */}
+                  {/* <div className="mt-10 flex items-center gap-4">
+              <img
+                src={t.image}
+                alt={t.name}
+                className="h-14 w-14 rounded-full object-cover"
+              />
+              <div>
+                <p className="font-semibold text-[#0a2540]">{t.name}</p>
+                <p className="text-sm text-slate-500">{t.role}</p>
+              </div>
+            </div> */}
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+
+          {/* Navigation buttons */}
+          <div className="mt-10 flex justify-center gap-4">
+            <button className="testimonial-prev flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#0a2540] text-[#0a2540] hover:bg-[#0a2540] hover:text-white transition">
+              <FaArrowLeft />
+            </button>
+            <button className="testimonial-next flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[#0a2540] text-[#0a2540] hover:bg-[#0a2540] hover:text-white transition">
+              <FaArrowRight />
+            </button>
+          </div>
+
+        </div>
+      </section>
+      <UseCasesSlider />
+
+      {/* MORE THAN A LINK SHORTENER SECTION */}
+      <section className="relative overflow-hidden bg-[#071b34] py-28">
+        <div className="mx-auto max-w-7xl px-6 text-center">
+
+          {/* Heading */}
+          <h2 className="mb-6 text-4xl font-extrabold text-orange-400 sm:text-5xl">
+            More than a link shortener
+          </h2>
+
+          {/* Sub text */}
+          <p className="mx-auto mb-10 max-w-3xl text-lg leading-relaxed text-slate-200">
+            Knowing how your clicks and scans are performing should be as easy as making
+            them. Track, analyze, and optimize all your connections in one place.
+          </p>
+
+          {/* CTA */}
+          <button
+            className="
+        inline-flex items-center gap-3 rounded-full
+        border-2 border-white px-8 py-4
+        text-lg font-semibold text-white
+        hover:bg-white hover:text-[#071b34]
+        transition
+      "
+          >
+            Get started for free
+            <span className="text-xl">→</span>
+          </button>
+        </div>
+
+        {/* Dashboard Image */}
+        <div className="relative mt-20 flex justify-center px-6">
+          <img
+            src={Dashimag}  // <-- replace with your image path
+            alt="Dashboard preview"
+            className="
+        w-full max-w-5xl rounded-3xl shadow-2xl
+      "
+          />
+        </div>
+
+        {/* Decorative shapes */}
+        <div className="pointer-events-none absolute inset-0 opacity-20">
+          <span className="absolute left-10 top-20 text-4xl text-slate-400">*</span>
+          <span className="absolute right-20 top-32 text-5xl text-slate-400">✦</span>
+          <span className="absolute left-10 bottom-24 text-4xl text-slate-400">✱</span>
+        </div>
+      </section>
 
 
 
 
     </div>
+      <Footer />
+      </>
   );
 };
 

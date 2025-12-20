@@ -1,164 +1,196 @@
 import { Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
+import { useState } from "react";
 
 const Pricing = () => {
-  const plans = [
-    {
-      name: "Free",
-      price: "$0",
-      period: "forever",
-      description: "Perfect for getting started",
-      features: [
-        "Up to 50 links/month",
-        "Basic analytics",
-        "QR code generation",
-        "Standard link shortening",
-        "Email support",
-      ],
-      cta: "Get Started",
-      ctaLink: "/signup",
-      popular: false,
-    },
-    {
-      name: "Professional",
-      price: "$9",
-      period: "per month",
-      description: "For professionals and small businesses",
-      features: [
-        "Unlimited links",
-        "Advanced analytics",
-        "Custom branded links",
-        "QR code generation",
-        "Priority support",
-        "Bulk link management",
-        "Link expiration dates",
-      ],
-      cta: "Start Free Trial",
-      ctaLink: "/signup",
-      popular: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "",
-      description: "For large organizations",
-      features: [
-        "Everything in Professional",
-        "Custom API integrations",
-        "Dedicated account manager",
-        "SLA guarantee",
-        "Advanced security features",
-        "Team collaboration tools",
-        "White-label options",
-      ],
-      cta: "Contact Sales",
-      ctaLink: "/login",
-      popular: false,
-    },
-  ];
+  const pricingPlans = {
+    monthly: [
+      {
+        name: "Free",
+        price: "$0",
+        period: "/month",
+        // badge: "With ads",
+        features: [
+          "5 QR Codes/month",
+          "10 links/month",
+          "2 custom landing pages",
+          "Unlimited clicks & scans",
+        ],
+      },
+      {
+        name: "Core",
+        price: "$15",
+        period: "/month",
+        features: [
+          "10 QR Codes/month",
+          "100 links/month",
+          "5 landing pages",
+          "30 days analytics",
+        ],
+      },
+      {
+        name: "Growth",
+        price: "$35",
+        period: "/month",
+        popular: true,
+        features: [
+          "15 QR Codes/month",
+          "500 links/month",
+          "10 landing pages",
+          "Branded links",
+        ],
+      },
+      {
+        name: "Premium",
+        price: "$300",
+        period: "/month",
+        features: [
+          "200 QR Codes/month",
+          "3000 links/month",
+          "Advanced analytics",
+          "Deep linking",
+        ],
+      },
+    ],
+
+    annual: [
+      {
+        name: "Free",
+        price: "$0",
+        period: "/month",
+        // badge: "With ads",
+        features: [
+          "5 QR Codes/month",
+          "10 links/month",
+          "2 custom landing pages",
+          "Unlimited clicks & scans",
+        ],
+      },
+      {
+        name: "Core",
+        price: "$10",
+        period: "/month",
+        note: "Billed $120/year",
+        features: [
+          "10 QR Codes/month",
+          "100 links/month",
+          "5 landing pages",
+          "30 days analytics",
+        ],
+      },
+      {
+        name: "Growth",
+        price: "$29",
+        period: "/month",
+        popular: true,
+        note: "Billed $348/year",
+        features: [
+          "15 QR Codes/month",
+          "500 links/month",
+          "10 landing pages",
+          "Custom domain",
+        ],
+      },
+      {
+        name: "Premium",
+        price: "$199",
+        period: "/month",
+        note: "Billed $2388/year",
+        features: [
+          "200 QR Codes/month",
+          "3000 links/month",
+          "1 year analytics",
+          "Campaign tracking",
+        ],
+      },
+    ],
+  };
+  const [billing, setBilling] = useState("annual");
 
   return (
-    <div className="min-h-screen pt-20 pb-16 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Simple, Transparent Pricing
-          </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Choose the plan that's right for you. Upgrade or downgrade at any time.
-          </p>
-        </div>
+    <div className="min-h-screen bg-[#faf7f2] py-20 px-6">
+      <h1 className="text-4xl font-bold text-center mb-4 text-black">
+        Pricing for brands and businesses of all sizes
+      </h1>
+      <p className=" font-bold text-center mb-8 text-[#474747]">
+      Connect to your audience with branded links, QR Codes, and landing pages that will get their attention.
+      </p>
+      
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-          {plans.map((plan, index) => (
-            <div
-              key={index}
-              className={`relative bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border-2 ${
-                plan.popular
-                  ? "border-cyan-500 shadow-2xl shadow-cyan-500/20 scale-105"
-                  : "border-slate-700"
+      {/* Toggle */}
+      <div className="flex justify-center mb-12">
+        <div className="bg-white p-1 rounded-full shadow">
+          {["annual", "monthly"].map((type) => (
+            <button
+              key={type}
+              onClick={() => setBilling(type)}
+              className={`px-6 py-2 rounded-full font-semibold transition ${
+                billing === type
+                  ? "bg-blue-600 text-white"
+                  : "text-black"
               }`}
             >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-cyan-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    Most Popular
-                  </span>
-                </div>
-              )}
-
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
-                <p className="text-slate-400 mb-6">{plan.description}</p>
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-5xl font-bold text-white">{plan.price}</span>
-                  {plan.period && (
-                    <span className="text-slate-400">/{plan.period}</span>
-                  )}
-                </div>
-              </div>
-
-              <ul className="space-y-4 mb-8">
-                {plan.features.map((feature, featureIndex) => (
-                  <li key={featureIndex} className="flex items-start gap-3">
-                    <FaCheck className="text-cyan-500 mt-1 flex-shrink-0" />
-                    <span className="text-slate-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                to={plan.ctaLink}
-                className={`block w-full text-center py-3 px-6 rounded-lg font-semibold transition ${
-                  plan.popular
-                    ? "bg-cyan-500 hover:bg-cyan-600 text-white"
-                    : "bg-slate-700 hover:bg-slate-600 text-white"
-                }`}
-              >
-                {plan.cta}
-              </Link>
-            </div>
+              Pay {type}
+            </button>
           ))}
         </div>
+      </div>
 
-        {/* FAQ Section */}
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-white text-center mb-12">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Can I change plans later?
-              </h3>
-              <p className="text-slate-300">
-                Yes, you can upgrade or downgrade your plan at any time. Changes will be reflected in your next billing cycle.
-              </p>
+      {/* Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        {pricingPlans[billing].map((plan, i) => (
+          <div
+            key={i}
+            className={`bg-white rounded-xl p-6 border ${
+              plan.popular
+                ? "border-orange-500 shadow-lg"
+                : "border-gray-200"
+            }`}
+          >
+            {plan.popular && (
+              <span className="bg-orange-500 text-white text-xs px-3 py-1 rounded-full">
+                Recommended
+              </span>
+            )}
+
+            <h3 className="text-xl font-bold mt-4 text-black">{plan.name}</h3>
+            {plan.badge && (
+              <span className="text-xs bg-gray-100 px-2 py-1 rounded ml-2">
+                {plan.badge}
+              </span>
+            )}
+
+            <div className="my-6">
+              <span className="text-4xl font-bold text-black">{plan.price}</span>
+              <span className="text-gray-500">{plan.period}</span>
+              {plan.note && (
+                <p className="text-sm text-gray-400">{plan.note}</p>
+              )}
             </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                What payment methods do you accept?
-              </h3>
-              <p className="text-slate-300">
-                We accept all major credit cards, PayPal, and bank transfers for Enterprise plans.
-              </p>
-            </div>
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-xl p-6 border border-slate-700">
-              <h3 className="text-xl font-semibold text-white mb-2">
-                Is there a free trial?
-              </h3>
-              <p className="text-slate-300">
-                Yes, all paid plans come with a 14-day free trial. No credit card required.
-              </p>
-            </div>
+
+            <ul className="space-y-3 mb-6">
+              {plan.features.map((f, idx) => (
+                <li key={idx} className="flex gap-2 text-black">
+                  <FaCheck className="text-blue-600 mt-1" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+
+            <button
+              className={`w-full py-2 rounded-lg font-semibold ${
+                plan.popular
+                  ? "bg-blue-600 text-white"
+                  : "border border-blue-600 text-blue-600"
+              }`}
+            >
+              Get Started
+            </button>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 };
 
 export default Pricing;
-
